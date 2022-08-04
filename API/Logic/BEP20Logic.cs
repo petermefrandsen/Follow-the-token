@@ -48,7 +48,7 @@ namespace Logic
             return new BEP20TokenTransactionResponse(request.Address, intialAddressTransactions, subAddressTransactions);
         }
 
-        private async Task<List<BscScanTokenTransfer>> GetTransactionsForAddress(string address, string contract)
+        public async Task<List<BscScanTokenTransfer>> GetTransactionsForAddress(string address, string contract)
         {
             var page = 1;
             var transactions = new List<BscScanTokenTransfer>();

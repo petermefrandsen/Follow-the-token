@@ -2,14 +2,14 @@
 
 ## Quickstart
 
-Add connection string(s)
+Add secret(s)
 
-Example for local appsettings.json:
+Example for local appsettings.Local.json:
 
 ``` json
 {
-    "ConnectionsString": {
-        "BscScanApiKey": "Your-BscScan-Api-Key",
-    }
+    "BscScanApiKey": "Your-BscScan-Api-Key"
 }
 ```
+
+
