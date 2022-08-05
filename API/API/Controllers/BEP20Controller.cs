@@ -8,18 +8,18 @@ namespace API.Controllers
     [Route("api/[controller]")]
     [EnableCors("FollowTheTokenAPI")]
     [ApiController]
-    public class BEP20Controller : ControllerBase
+    public class Bep20Controller : ControllerBase
     {
-        private readonly IBEP20Logic _bep20Logic;
+        private readonly IBep20Logic _bep20Logic;
 
-        public BEP20Controller(IBEP20Logic bEP20Logic)
+        public Bep20Controller(IBep20Logic bEP20Logic)
         {
             _bep20Logic = bEP20Logic;
         }
 
         [Route("getBEP20TokenTransactions")]
         [HttpPost]
-        public async Task<ActionResult<BEP20TokenTransactionResponse>> GetBEP20TokenTransactions([FromBody] BEP20TokenTransactionRequest request)
+        public async Task<ActionResult<Bep20TokenTransactionResponse>> GetBEP20TokenTransactions([FromBody] Bep20TokenTransactionRequest request)
         {
             var response = await _bep20Logic.GetBEP20TokenTransactions(request);
             return Ok(response);

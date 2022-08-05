@@ -7,8 +7,8 @@ on:
     types: [opened, synchronize, reopened]
   
 jobs:
-  sonarcloud:
-    name: SonarCloud
+  build:
+    name: Build
     runs-on: windows-latest
     steps:
       - name: Set up JDK 11
@@ -42,16 +42,30 @@ jobs:
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
 
+      # - name: Cache dotnet-coverage
+      #   id: cache-dotnet-coverage
+      #   uses: actions/cache@v1
+      #   with:
+      #     path: .\.dotnet-coverage
+      #     key: ${{ runner.os }}-dotnet-coverage
+      #     restore-keys: ${{ runner.os }}-dotnet-coverage
+
+      # - name: Install dotnet-coverage
+      #   if: steps.cache-dotnet-coverage.outputs.cache-hit != 'true'
+      #   shell: powershell
+      #   run: |
+      #     New-Item -Path .\.dotnet-coverage -ItemType Directory
+      #     dotnet tool install --global dotnet-coverage
+
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"petermefrandsen_Follow-the-token" /o:"petermefrandsengithub" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-          dotnet build API/Follow-the-token-API.sln
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          dotnet tool install --global dotnet-coverage
 
-      - name: Run tests with coverage report
-        run: |
-          dotnet test API /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"petermefrandsen_Follow-the-token" /o:"petermefrandsengithub" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+          dotnet build API/Follow-the-token-API.sln --configuration Release
+          dotnet-coverage collect 'dotnet test API/Follow-the-token-API.sln' -f xml -o 'coverage.xml'
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"

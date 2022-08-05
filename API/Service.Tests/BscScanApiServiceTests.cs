@@ -25,7 +25,7 @@ namespace Service.Tests
             _iconfigurationMock.SetupGet(x => x[It.Is<string>(s => s == "BscScanApiKey")]).Returns(_bscScanApiKey);
         }
 
-        public void Dispose()
+        internal void Dispose()
         {
             _httpTest.Dispose();
         }

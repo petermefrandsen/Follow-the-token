@@ -1,6 +1,6 @@
 ﻿namespace Common.Models
 {
-    public class BEP20TokenTransactionIgnoreAddress
+    public class Bep20TokenTransactionIgnoreAddress
     {
         /// <summary>
         /// Address to ignore

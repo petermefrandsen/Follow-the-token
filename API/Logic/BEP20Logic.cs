@@ -3,16 +3,16 @@ using Service;
 
 namespace Logic
 {
-    public class BEP20Logic : IBEP20Logic
+    public class Bep20Logic : IBep20Logic
     {
         private readonly IBscScanApiService _bscScanApiService;
 
-        public BEP20Logic(IBscScanApiService bscScanApiService)
+        public Bep20Logic(IBscScanApiService bscScanApiService)
         {
             _bscScanApiService = bscScanApiService;
         }
 
-        public async Task<BEP20TokenTransactionResponse> GetBEP20TokenTransactions(BEP20TokenTransactionRequest request)
+        public async Task<Bep20TokenTransactionResponse> GetBEP20TokenTransactions(Bep20TokenTransactionRequest request)
         {
             if(request.Address == null || request.Address.Length == 0)
             {
@@ -39,13 +39,13 @@ namespace Logic
                 .Distinct()
                 .ToList();
 
-            var subAddressTransactions = new List<BEP20TokenTransactions>();
+            var subAddressTransactions = new List<Bep20TokenTransactions>();
 
             var initialDepth = 1;
             await GetSubAddressTransactions(request.BEP20TokenContract, distinctAddressesOutgoingTransactions, addressesToIgnore,
                 subAddressTransactions, request.ExplorationDepth, initialDepth);
 
-            return new BEP20TokenTransactionResponse(request.Address, intialAddressTransactions, subAddressTransactions);
+            return new Bep20TokenTransactionResponse(request.Address, intialAddressTransactions, subAddressTransactions);
         }
 
         public async Task<List<BscScanTokenTransfer>> GetTransactionsForAddress(string address, string contract)
@@ -72,7 +72,7 @@ namespace Logic
         }
 
         private async Task GetSubAddressTransactions(string contract, List<string> addressesForLookup, List<string> addressesToIgnore, 
-            List<BEP20TokenTransactions> subAddressTransactions, int maxExplorationDepth, int depth)
+            List<Bep20TokenTransactions> subAddressTransactions, int maxExplorationDepth, int depth)
         {
             if (depth > maxExplorationDepth || depth == 0)
             {
@@ -85,7 +85,7 @@ namespace Logic
             foreach (var subAddress in addressesForLookup)
             {
                 var transactions = await GetTransactionsForAddress(subAddress, contract);
-                subAddressTransactions.Add(new BEP20TokenTransactions(subAddress, depth, transactions));
+                subAddressTransactions.Add(new Bep20TokenTransactions(subAddress, depth, transactions));
                 addressesToIgnore.Add(subAddress);
 
                 var subDistinctAddressesOutgoingTransactions = transactions
@@ -103,7 +103,7 @@ namespace Logic
             }
         }
 
-        public Task<BEP20TokenTransactionResponseSimplified> GetBEP20TokenTransactionsSimplified(BEP20TokenTransactionRequest request)
+        public Task<Bep20TokenTransactionResponseSimplified> GetBEP20TokenTransactionsSimplified(Bep20TokenTransactionRequest request)
         {
             throw new NotImplementedException();
         }

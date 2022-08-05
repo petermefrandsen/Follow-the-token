@@ -1,12 +1,7 @@
 ﻿namespace Common.Models
 {
-    public class BEP20TokenTransactionRequest
-    {
-        /// <summary>
-        /// (optional) BscScan.com API key, can be obtained at https://bscscan.com/apis
-        /// </summary>
-        //public string? BscScanAPIKey { get; set; }
-        
+    public class Bep20TokenTransactionRequest
+    {      
         /// <summary>
         /// Token contract for exploration
         /// </summary>
@@ -20,7 +15,7 @@
         /// <summary>
         /// Addresses to ignore, e.g. liquitidy pools and alike
         /// </summary>
-        public List<BEP20TokenTransactionIgnoreAddress>? IgnoreAddresses { get; set; }
+        public List<Bep20TokenTransactionIgnoreAddress>? IgnoreAddresses { get; set; }
 
         /// <summary>
         /// The depth of addresses explored, i.e. 

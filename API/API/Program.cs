@@ -9,7 +9,7 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 
 // Add services to the container.
 builder.Services.AddScoped<IBscScanApiService, BscScanApiService>();
-builder.Services.AddScoped<IBEP20Logic, BEP20Logic>();
+builder.Services.AddScoped<IBep20Logic, Bep20Logic>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

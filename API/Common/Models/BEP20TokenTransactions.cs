@@ -1,12 +1,12 @@
 ﻿namespace Common.Models
 {
-    public class BEP20TokenTransactions
+    public class Bep20TokenTransactions
     {
         private readonly string _address;
         private readonly int _explorationDepth;
         private readonly List<BscScanTokenTransfer> _bscScanTokenTransfers;
 
-        public BEP20TokenTransactions(string initialAddress, int explorationDepth, List<BscScanTokenTransfer> bscScanTokenTransfers)
+        public Bep20TokenTransactions(string initialAddress, int explorationDepth, List<BscScanTokenTransfer> bscScanTokenTransfers)
         {
             _address = initialAddress;
             _explorationDepth = explorationDepth;
