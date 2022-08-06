@@ -95,7 +95,7 @@ namespace Logic
                 if (subDistinctAddressesOutgoingTransactions.Any())
                 {
                     await GetSubAddressTransactions(contract, subDistinctAddressesOutgoingTransactions, addressesToIgnore,
-                        subAddressTransactions, maxExplorationDepth, depth + 1); ;
+                        subAddressTransactions, maxExplorationDepth, depth + 1);
                 }
             }
         }
