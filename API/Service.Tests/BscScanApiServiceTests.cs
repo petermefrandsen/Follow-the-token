@@ -9,7 +9,6 @@ namespace Service.Tests
         private readonly string _bscScanBaseUrl = "http://www.example.com";
         private readonly string _bscScanApiKey = "APIKEY";
 
-
         public BscScanApiServiceTests()
         {
             _httpTest = new HttpTest();

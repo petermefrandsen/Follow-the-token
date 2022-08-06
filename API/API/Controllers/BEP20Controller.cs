@@ -21,7 +21,7 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<Bep20TokenTransactionResponse>> GetBEP20TokenTransactions([FromBody] Bep20TokenTransactionRequest request)
         {
-            var response = await _bep20Logic.GetBEP20TokenTransactions(request);
+            var response = await _bep20Logic.GetBep20TokenTransactions(request);
             return Ok(response);
         }
     }

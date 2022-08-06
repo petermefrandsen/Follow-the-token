@@ -5,7 +5,7 @@
         /// <summary>
         /// Token contract for exploration
         /// </summary>
-        public string? BEP20TokenContract { get; set; }
+        public string? Bep20TokenContract { get; set; }
         
         /// <summary>
         /// Address for intial lookup

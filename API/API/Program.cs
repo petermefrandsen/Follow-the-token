@@ -1,3 +1,6 @@
+using Common.Models;
+using Common.Validators;
+using FluentValidation;
 using Logic;
 using Service;
 
@@ -10,6 +13,7 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 // Add services to the container.
 builder.Services.AddScoped<IBscScanApiService, BscScanApiService>();
 builder.Services.AddScoped<IBep20Logic, Bep20Logic>();
+builder.Services.AddScoped<IValidator<Bep20TokenTransactionRequest>, Bep20TokenTransactionRequestValidator>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

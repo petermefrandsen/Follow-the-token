@@ -9,7 +9,6 @@ namespace Service
     {
         private readonly string _bscScanApiKey;
         private readonly string _bscScanBaseUrl;
-        private const int apiLimitDelay = 200;
 
         public BscScanApiService(IConfiguration configuration)
         {
@@ -17,7 +16,7 @@ namespace Service
             _bscScanBaseUrl = configuration.GetConnectionString("BscScanBaseUrl");
         }
 
-        public async Task<BscScanResult<List<BscScanTokenTransfer>>> GetTokenTransferEventsForAddress(string address, int offset, int page, string? contractAddress = null, int retryLimit = 10)
+        public async Task<BscScanResult<List<BscScanTokenTransfer>>> GetTokenTransferEventsForAddress(string address, int offset, int page, string? contractAddress = null, int retryLimit = 10, int apiLimitDelay = 200)
         {
             var delayApiCall = false;
             var retries = 0;
@@ -29,6 +28,8 @@ namespace Service
 
                 try
                 {
+                    delayApiCall = false;
+
                     result = await _bscScanBaseUrl
                     .SetQueryParams(new
                     {
@@ -50,10 +51,9 @@ namespace Service
                 {
                     retries++;
                     
-                    if (e.InnerException != null && !e.InnerException.Message.Contains("Max rate limit reached"))
+                    if (e.InnerException != null && e.InnerException.Message.Contains("Max rate limit reached"))
                     {
                         delayApiCall = true;
-                        throw;
                     }
 
                     result = new BscScanResult<List<BscScanTokenTransfer>>

@@ -1,34 +1,31 @@
 ﻿using Common.Models;
+using FluentValidation;
 using Service;
 
 namespace Logic
 {
     public class Bep20Logic : IBep20Logic
     {
+        private readonly IValidator<Bep20TokenTransactionRequest> _requestValidator;
         private readonly IBscScanApiService _bscScanApiService;
 
-        public Bep20Logic(IBscScanApiService bscScanApiService)
+        public Bep20Logic(IBscScanApiService bscScanApiService, IValidator<Bep20TokenTransactionRequest> requestValidator)
         {
             _bscScanApiService = bscScanApiService;
+            _requestValidator = requestValidator;
         }
 
-        public async Task<Bep20TokenTransactionResponse> GetBEP20TokenTransactions(Bep20TokenTransactionRequest request)
+        public async Task<Bep20TokenTransactionResponse> GetBep20TokenTransactions(Bep20TokenTransactionRequest request)
         {
-            if(request.Address == null || request.Address.Length == 0)
-            {
-                throw new ArgumentException("Address cannot be null or empty");
-            }
-
-            if (request.BEP20TokenContract == null || request.BEP20TokenContract.Length == 0)
-            {
-                throw new ArgumentException("BEP20TokenContract cannot be null or empty");
-            }
+            _requestValidator.ValidateAndThrow(request);
 
             var addressesToIgnore = request.IgnoreAddresses?
                 .Select(ignoreAddress => ignoreAddress.Address).OfType<string>()
                 .ToList() ?? new List<string>();
 
-            var intialAddressTransactions = await GetTransactionsForAddress(request.Address, request.BEP20TokenContract);
+#pragma warning disable CS8604 // Possible null reference argument.
+            var intialAddressTransactions = await GetTransactionsForAddress(request.Address, request.Bep20TokenContract);
+#pragma warning restore CS8604 // Possible null reference argument.
 
             addressesToIgnore.Add(request.Address);
 
@@ -42,7 +39,7 @@ namespace Logic
             var subAddressTransactions = new List<Bep20TokenTransactions>();
 
             var initialDepth = 1;
-            await GetSubAddressTransactions(request.BEP20TokenContract, distinctAddressesOutgoingTransactions, addressesToIgnore,
+            await GetSubAddressTransactions(request.Bep20TokenContract, distinctAddressesOutgoingTransactions, addressesToIgnore,
                 subAddressTransactions, request.ExplorationDepth, initialDepth);
 
             return new Bep20TokenTransactionResponse(request.Address, intialAddressTransactions, subAddressTransactions);
@@ -103,7 +100,7 @@ namespace Logic
             }
         }
 
-        public Task<Bep20TokenTransactionResponseSimplified> GetBEP20TokenTransactionsSimplified(Bep20TokenTransactionRequest request)
+        public Task<Bep20TokenTransactionResponseSimplified> GetBep20TokenTransactionsSimplified(Bep20TokenTransactionRequest request)
         {
             throw new NotImplementedException();
         }
