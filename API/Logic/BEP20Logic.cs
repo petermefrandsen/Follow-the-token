@@ -29,18 +29,21 @@ namespace Logic
 
             addressesToIgnore.Add(request.Address);
 
-            var distinctAddressesOutgoingTransactions = intialAddressTransactions
-                .Where(transaction => addressesToIgnore.All(addressNotToProcess => addressNotToProcess != transaction.To))
-                .Select(transaction => transaction.To)
-                .OfType<string>()
-                .Distinct()
-                .ToList();
-
             var subAddressTransactions = new List<Bep20TokenTransactions>();
 
-            var initialDepth = 1;
-            await GetSubAddressTransactions(request.Bep20TokenContract, distinctAddressesOutgoingTransactions, addressesToIgnore,
-                subAddressTransactions, request.ExplorationDepth, initialDepth);
+            if(intialAddressTransactions.Count > 0)
+            {
+                var distinctAddressesOutgoingTransactions = intialAddressTransactions
+                    .Where(transaction => addressesToIgnore.All(addressNotToProcess => addressNotToProcess != transaction.To))
+                    .Select(transaction => transaction.To)
+                    .OfType<string>()
+                    .Distinct()
+                    .ToList();
+
+                var initialDepth = 1;
+                await GetSubAddressTransactions(request.Bep20TokenContract, distinctAddressesOutgoingTransactions, addressesToIgnore,
+                    subAddressTransactions, request.ExplorationDepth, initialDepth);
+            }
 
             return new Bep20TokenTransactionResponse(request.Address, intialAddressTransactions, subAddressTransactions);
         }

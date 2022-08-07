@@ -19,25 +19,6 @@ namespace Logic.Tests
         }
 
         [Fact]
-        public async Task GetBep20TokenTransactions_ThrowsException_WhenInvalidRequest()
-        {
-            // ARRANGE
-            var request = new Bep20TokenTransactionRequest()
-            {
-                Address = null,
-                Bep20TokenContract = "1234",
-                ExplorationDepth = 0,
-                IgnoreAddresses = null
-            };
-
-            // ACT
-            Func<Task> act = () => _bep20Logic.GetBep20TokenTransactions(request);
-
-            // ASSERT
-            await act.Should().ThrowAsync<FluentValidation.ValidationException>();
-        }
-
-        [Fact]
         public async Task GetTransactionsForAddress_ThrowsException_WhenBscScanApiThrowsException()
         {
             // ARRANGE
@@ -111,6 +92,99 @@ namespace Logic.Tests
 
             // ASSERT
             result.Should().HaveCount(2);
+        }
+
+        [Fact]
+        public async Task GetTransactionsForAddress_ReturnsEmptyList_WhenFirstResultIsNull()
+        {
+            // ARRANGE
+            var request = new Bep20TokenTransactionRequest()
+            {
+                Address = "1234",
+                Bep20TokenContract = "1234",
+                ExplorationDepth = 0,
+                IgnoreAddresses = null
+            };
+
+            // ACT
+            var result = await _bep20Logic.GetTransactionsForAddress(request.Address, request.Bep20TokenContract);
+
+            // ASSERT
+            result.Should().HaveCount(0);
+        }
+
+        [Fact]
+        public async Task GetTransactionsForAddress_ReturnsOneItemList_WhenSecondResultStatusIsNull()
+        {
+            // ARRANGE
+            var request = new Bep20TokenTransactionRequest()
+            {
+                Address = "1234",
+                Bep20TokenContract = "1234",
+                ExplorationDepth = 0,
+                IgnoreAddresses = null
+            };
+            _bscScanApiServiceMock.SetupSequence(mock => mock.GetTokenTransferEventsForAddress(request.Address, 1000, It.IsAny<int>(), request.Bep20TokenContract, 10, 200))
+                .ReturnsAsync(GetBscScanResult(1))
+                .ReturnsAsync(new BscScanResult<List<BscScanTokenTransfer>>
+                {
+                    Message = "",
+                    Status = null
+                });
+
+            // ACT
+            var result = await _bep20Logic.GetTransactionsForAddress(request.Address, request.Bep20TokenContract);
+
+            // ASSERT
+            result.Should().HaveCount(1);
+        }
+
+
+        [Fact]
+        public async Task GetBep20TokenTransactions_ThrowsException_WhenInvalidRequest()
+        {
+            // ARRANGE
+            var request = new Bep20TokenTransactionRequest()
+            {
+                Address = null,
+                Bep20TokenContract = "1234",
+                ExplorationDepth = 0,
+                IgnoreAddresses = null
+            };
+
+            // ACT
+            Func<Task> act = () => _bep20Logic.GetBep20TokenTransactions(request);
+
+            // ASSERT
+            await act.Should().ThrowAsync<FluentValidation.ValidationException>();
+        }
+
+        [Fact]
+        public async Task GetBep20TokenTransactions_ReturnsReponseWithEmptyLists_WhenAddressHasNoTransactions()
+        {
+            // ARRANGE
+            var request = new Bep20TokenTransactionRequest()
+            {
+                Address = "1234",
+                Bep20TokenContract = "1234",
+                ExplorationDepth = 0,
+                IgnoreAddresses = null
+            };
+            _bscScanApiServiceMock.SetupSequence(mock => mock.GetTokenTransferEventsForAddress(request.Address, 1000, It.IsAny<int>(), request.Bep20TokenContract, 10, 200))
+                .ReturnsAsync(new BscScanResult<List<BscScanTokenTransfer>>
+                {
+                    Message = "",
+                    Status = "1",
+                    Result = new List<BscScanTokenTransfer>()
+                });
+
+            // ACT
+            var result = await _bep20Logic.GetBep20TokenTransactions(request);
+
+            // ASSERT
+            result.Address.Should().Be(request.Address);
+            result.Transactions.Should().HaveCount(0);
+            result.SubAddressTransactions.Should().HaveCount(0);
         }
 
         private static BscScanResult<List<BscScanTokenTransfer>> GetBscScanResult(int id)
