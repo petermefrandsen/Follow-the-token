@@ -14,6 +14,12 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
+ <ItemGroup>
+  <SonarQubeSetting Include="sonar.coverage.exclusions">
+    <Value>**/Program.cs</Value>
+  </SonarQubeSetting>
+ </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Logic\Logic.csproj" />
