@@ -51,7 +51,7 @@ namespace Service
                 {
                     retries++;
                     
-                    if (e.InnerException != null && e.InnerException.Message.Contains("Max rate limit reached"))
+                    if (e.InnerException != null && e.InnerException.Message.ToLower().Contains("max rate limit reached"))
                     {
                         delayApiCall = true;
                     }

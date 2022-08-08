@@ -46,15 +46,81 @@ namespace Service.Tests
             var address = "testAddress";
             var offset = 0;
             var page = 0;
-            var contract = "contract";
+            var contractAddress = "contract";
             var retryLimit = 5;
 
             // ACT
-            var result = await bscScanApiService.GetTokenTransferEventsForAddress(address, offset, page, contract, retryLimit);
+            var result = await bscScanApiService.GetTokenTransferEventsForAddress(address, offset, page, contractAddress, retryLimit);
 
             // ASSERT
             result.Status.Should().Be("0");
             _httpTest.ShouldHaveCalled(_bscScanBaseUrl).Times(retryLimit);
+        }
+
+        [Fact]
+        public async Task GetTokenTransferEventsForAddress_CallsFlurlTwice_WhenApiLimitExceptionOnce()
+        {
+            // ARANGE
+            var bscScanApiService = new BscScanApiService(_iconfigurationMock.Object);
+            var expectedResult = new List<BscScanTokenTransfer>()
+            {
+                new BscScanTokenTransfer {
+                    BlockNumber= "testValue",
+                    TimeStamp= "testValue",
+                    Hash= "testValue",
+                    Nonce= "testValue",
+                    BlockHash= "testValue",
+                    From= "testValue",
+                    ContractAddress= "testValue",
+                    To= "testValue",
+                    Value= "testValue",
+                    TokenName= "testValue",
+                    TokenSymbol= "testValue",
+                    TokenDecimal= "testValue",
+                    TransactionIndex= "testValue",
+                    Gas= "testValue",
+                    GasPrice= "testValue",
+                    GasUsed= "testValue",
+                    CumulativeGasUsed= "testValue",
+                    Input= "testValue",
+                    Confirmations= "testValue"
+                }
+            };
+            _httpTest.RespondWith("Max rate limit reached", 500)
+                .RespondWithJson(new BscScanResult<List<BscScanTokenTransfer>>
+                {
+                    Message = "",
+                    Status = "1",
+                    Result = expectedResult
+                });
+            var address = "testAddress";
+            var offset = 0;
+            var page = 0;
+            var contractAddress = "contract";
+            var retryLimit = 5;
+
+            // ACT
+            var result = await bscScanApiService.GetTokenTransferEventsForAddress(address, offset, page, contractAddress, retryLimit);
+
+            // ASSERT
+            result.Status.Should().Be("1");
+            _httpTest.ShouldHaveCalled(_bscScanBaseUrl)
+                .WithQueryParams(new
+                {
+                    module = "account",
+                    sort = "desc",
+                    action = "tokentx",
+                    contractaddress = contractAddress,
+                    startblock = 0,
+                    endblock = 999999999,
+                    offset,
+                    page,
+                    address,
+                    apikey = _bscScanApiKey
+                }).Times(2);
+            result.Result.Should().NotBeNull();
+            result.Result?.Count.Should().Be(1);
+            result.Result?.Should().BeEquivalentTo(expectedResult);
         }
 
         [Fact]
@@ -103,6 +169,7 @@ namespace Service.Tests
             var result = await bscScanApiService.GetTokenTransferEventsForAddress(address, offset, page, contractAddress, retryLimit);
 
             // ASSERT
+            result.Status.Should().Be("1");
             _httpTest.ShouldHaveCalled(_bscScanBaseUrl)
                 .WithQueryParams(new
                 {
