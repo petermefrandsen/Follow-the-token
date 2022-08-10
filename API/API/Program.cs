@@ -24,7 +24,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(p => {
     p.AddPolicy("FollowTheTokenAPI", builder =>
     {
-        builder.WithOrigins("http://localhost:4200", "https://followthetoken.petermefrandsen.com").AllowAnyMethod().AllowAnyHeader();
+        builder.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
     });
 });
 
