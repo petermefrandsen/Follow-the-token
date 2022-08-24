@@ -8,10 +8,33 @@ import { Plotly } from 'angular-plotly.js/lib/plotly.interface';
 })
 export class SankeyComponent implements OnInit {
   data = [
-    { x: [1, 2, 3], y: [2, 6, 3], type: 'scatter', mode: 'lines+points', marker: {color: 'red'} },
-    { x: [1, 2, 3], y: [2, 5, 3], type: 'bar' },
+    {
+      type: "sankey",
+      orientation: "h",
+      node: {
+        pad: 15,
+        thickness: 30,
+        line: {
+          color: "black",
+          width: 0.5
+        },
+       label: ["A1", "A2", "B1", "B2", "C1", "C2"],
+       color: ["blue", "blue", "blue", "blue", "blue", "blue"]
+          },
+    
+      link: {
+        source: [0,1,0,2,3,3],
+        target: [2,3,3,4,4,5],
+        value:  [8,4,2,8,4,2]
+      }
+    }    
   ];
-  layout = {width: 320, height: 240, title: 'A Fancy Plot'};
+  layout = {
+    title: "Basic Sankey",
+    font: {
+      size: 10
+    }
+  };
 
   constructor() { }
 
