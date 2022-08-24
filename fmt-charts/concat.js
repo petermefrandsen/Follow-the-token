@@ -5,16 +5,16 @@ const concat = require("concat");
   const files = [
     "./dist/fmt-charts/runtime.js",
     "./dist/fmt-charts/main.js",
-    "./dist/fmt-charts/polyfils",
+    "./dist/fmt-charts/polyfills.js",
   ]
 
-  const exists = fs.existsSync("elements");
+  const exists = fs.existsSync("fmt-charts");
 
   if (exists) {
-    fs.removeSync("elements");
+    fs.removeSync("fmt-charts");
   }
 
   await fs.ensureDir("elements");
-  await concat(files, "elements/elements.js");
+  await concat(files, "elements/fmt-charts.js");
   await fs.copyFile("./dist/fmt-charts/styles.css", "elements/styles.css");
 })();

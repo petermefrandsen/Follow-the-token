@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Plotly } from 'angular-plotly.js/lib/plotly.interface';
 
 @Component({
   selector: 'app-sankey',
   templateUrl: './sankey.component.html',
-  styleUrls: ['./sankey.component.css']
+  styleUrls: ['./sankey.component.css'],
+  encapsulation: ViewEncapsulation.ShadowDom
 })
 export class SankeyComponent implements OnInit {
   data = [
@@ -21,13 +22,13 @@ export class SankeyComponent implements OnInit {
        label: ["A1", "A2", "B1", "B2", "C1", "C2"],
        color: ["blue", "blue", "blue", "blue", "blue", "blue"]
           },
-    
+
       link: {
         source: [0,1,0,2,3,3],
         target: [2,3,3,4,4,5],
         value:  [8,4,2,8,4,2]
       }
-    }    
+    }
   ];
   layout = {
     title: "Basic Sankey",

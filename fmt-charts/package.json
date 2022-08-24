@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "build:fmt-charts": "ng build configuration production && node concat.js"
+    "build:fmt-charts": "ng build --configuration production && node concat.js"
   },
   "private": true,
   "dependencies": {
@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "^14.1.0",
     "@angular/router": "^14.1.0",
     "angular-plotly.js": "^4.0.4",
+    "concat": "^1.0.3",
     "plotly.js": "^2.14.0",
     "plotly.js-dist-min": "^2.14.0",
     "rxjs": "~7.5.0",
