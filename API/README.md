@@ -4,16 +4,6 @@ A C# API that provides a way for exploring the transactions made by a specific b
 
 ## Quickstart - local :wrench:
 
-### Add secret(s) 
-
-Add appsettings.Local.json and add the following secrets
-
-``` json
-{
-    "BscScanApiKey": "##Your-BscScan-Api-Key##"
-}
-```
-
 ### Add cors
 
 In program.cs add or change the cors settings.
@@ -29,7 +19,7 @@ docker build ./API -t follow-the-token-api-image
 ```
 
 ```go
-docker run -d -p 5000:80 --name follow-the-token-api follow-the-token-api-image --environment="local"
+docker run -d -p 5000:80 --name follow-the-token-api follow-the-token-api-image -e environment='development' -e BscScanApiKey='##Your-BscScan-Api-Key##'
 ```
 
 If environment variable is omitted then it defaults to production.

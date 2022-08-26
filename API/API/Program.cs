@@ -31,7 +31,7 @@ builder.Services.AddCors(p => {
 var app = builder.Build();
 
 //Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("local"))
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
