@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - API/**
     paths-ignore:
       - '**/*.md'
   pull_request:
