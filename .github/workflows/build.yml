@@ -3,10 +3,13 @@ on:
   push:
     branches:
       - master
-    paths-ignore:
-      - '**/*.md'
+    paths:
+      - API/**
+      - '!**/*.md'
   pull_request:
     types: [opened, synchronize, reopened]
+    branches:
+      - main
   
 jobs:
   build:
