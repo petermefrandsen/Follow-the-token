@@ -28,5 +28,5 @@ See the individual components for limitations.
 
 The project is under [MIT license][file-license].
 
-[api-readme]: api/readme.md
+[api-readme]: ./api/readme.md
 [file-license]: https://www.apache.org/licenses/LICENSE-2.0
