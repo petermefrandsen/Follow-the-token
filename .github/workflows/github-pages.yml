@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-        - fmt-chart/**
+      - fmt-charts/**
 jobs:
   build:
     runs-on: ubuntu-latest
