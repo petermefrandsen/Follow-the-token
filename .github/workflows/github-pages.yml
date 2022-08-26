@@ -11,7 +11,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - uses: actions/setup-node@v1 #this will install Node and npm on Ubuntu
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
     - run: npm install
     - run: npm install -g @angular/cli > /dev/null
     - run: ng build --prod --output-path=docs --base-href="https://petermefrandsen.github.io/Follow-the-token/"
