@@ -19,7 +19,7 @@ docker build ./API -t follow-the-token-api-image
 ```
 
 ```go
-docker run -d -p 5000:80 --name follow-the-token-api follow-the-token-api-image -e environment='development' -e BscScanApiKey='##Your-BscScan-Api-Key##'
+docker run -d -p 5000:80 --name follow-the-token-api follow-the-token-api-image -e ENVIRONMENT='development' -e BSC_SCAN_API_KEY='##Your-BscScan-Api-Key##'
 ```
 
 If environment variable is omitted then it defaults to production.
