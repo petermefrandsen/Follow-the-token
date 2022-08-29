@@ -12,8 +12,8 @@ namespace Service
 
         public BscScanApiService(IConfiguration configuration)
         {
-            _bscScanApiKey = configuration["BscScanApiKey"];
-            _bscScanBaseUrl = configuration.GetConnectionString("BscScanBaseUrl");
+            _bscScanApiKey = configuration["BSC_SCAN_API_KEY"];
+            _bscScanBaseUrl = configuration.GetConnectionString("BSC_SCAN_API_URL");
         }
 
         public async Task<BscScanResult<List<BscScanTokenTransfer>>> GetTokenTransferEventsForAddress(string address, int offset, int page, string? contractAddress = null, int retryLimit = 10, int apiLimitDelay = 200)

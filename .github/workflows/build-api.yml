@@ -1,0 +1,146 @@
+name: Build API
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - API/**
+      - '!**/*.md'
+      - .github/workflows/build.yml
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+    paths:
+      - API/**
+      - '!**/*.md'
+      - .github/workflows/build.yml
+  workflow_dispatch:
+  
+env:
+  CONTAINER_REGISTRY: ghcr.io
+  CONTAINER_IMAGE: ghcr.io/${{ github.repository }}_API
+  PLATFORMS: linux/amd64,linux/arm64
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: windows-latest
+    if: |
+      (github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]') ||
+      (github.event_name != 'pull_request_target' && github.actor != 'dependabot[bot]')
+    steps:
+      - name: Clone repository
+        if: ${{ github.event_name != 'pull_request_target' }}
+        uses: actions/checkout@v3
+
+        # Allow "dependabot[bot]" to verify its changes with access to secrets and modified code.
+      - name: Clone repository for Dependabot
+        if: ${{ github.event_name == 'pull_request_target' }}
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v1
+        with:
+          path: ~\sonar\cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache SonarCloud scanner
+        id: cache-sonar-scanner
+        uses: actions/cache@v1
+        with:
+          path: .\.sonar\scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+
+      - name: Install SonarCloud scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          New-Item -Path .\.sonar\scanner -ItemType Directory
+          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: powershell
+        run: |
+          dotnet tool install --global dotnet-coverage
+
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"petermefrandsen_Follow-the-token" /o:"petermefrandsengithub" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+          dotnet build API/Follow-the-token-API.sln --configuration Release
+          dotnet-coverage collect 'dotnet test API/Follow-the-token-API.sln' -f xml -o 'coverage.xml'
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+
+  container:
+    name: Container
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]') ||
+      (github.event_name != 'pull_request_target' && github.actor != 'dependabot[bot]')
+    needs: [ build ]
+    steps:
+      - name: Clone repository
+        if: ${{ github.event_name != 'pull_request_target' }}
+        uses: actions/checkout@v3
+
+        # Allow "dependabot[bot]" to verify its changes with access to secrets and modified code.
+      - name: Clone repository for Dependabot
+        if: ${{ github.event_name == 'pull_request_target' }}
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Fetch version from git history
+        uses: codfish/semantic-release-action@v2
+        id: semantic
+        with:
+          dry_run: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate container metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.CONTAINER_IMAGE }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=v${{ steps.semantic.outputs.release-version }},enable=${{ steps.semantic.outputs.new-release-published }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push container image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./API
+          cache-from: type=registry,ref=${{ env.CONTAINER_IMAGE }}:main
+          cache-to: type=inline
+          platforms: ${{ env.PLATFORMS }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: ${{ steps.semantic.outputs.new-release-published }}
+          build-args: |
+            VERSION=v${{ steps.semantic.outputs.release-version }}

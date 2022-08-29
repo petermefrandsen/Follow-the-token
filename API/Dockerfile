@@ -3,7 +3,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN dotnet publish -c Release -o /app/publish \
+RUN dotnet publish API -c Release -o /app/publish \
     --runtime alpine-x64 \
     --self-contained true \
     /p:PublishTrimmed=true \
@@ -14,4 +14,4 @@ FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine
 
 WORKDIR /app
 COPY --from=build /app/publish .
-ENTRYPOINT ["./Follow-the-token-API"]
+ENTRYPOINT ["./API"]
