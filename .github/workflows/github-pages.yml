@@ -40,9 +40,15 @@ jobs:
     - name: npm install
       working-directory: ./fmt-charts
       run: npm install
+    - name: Generate webcomponent element
+      working-directory: ./fmt-charts 
+      run: npm run build:fmt-charts
     - name: Generate GitHub page content
       working-directory: ./fmt-charts      
       run: ng build --configuration production --output-path=docs --base-href="https://petermefrandsen.github.io/Follow-the-token/"
+    - name: Move webcomponent element files
+      working-directory: ./fmt-charts 
+      run: mv elements/* docs
     - name: Setup Pages
       uses: actions/configure-pages@v2
     - name: Upload artifact

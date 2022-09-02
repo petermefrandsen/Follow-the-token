@@ -5,7 +5,7 @@ import { Plotly } from 'angular-plotly.js/lib/plotly.interface';
   selector: 'app-sankey',
   templateUrl: './sankey.component.html',
   styleUrls: ['./sankey.component.css'],
-  encapsulation: ViewEncapsulation.ShadowDom
+  // encapsulation: ViewEncapsulation.ShadowDom
 })
 export class SankeyComponent implements OnInit {
   data = [
